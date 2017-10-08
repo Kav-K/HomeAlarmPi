@@ -21,8 +21,7 @@ signal.signal(signal.SIGINT, end_read)
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
-# Welcome message
-print "Welcome to the MFRC522 data read example"
+
 print "Press Ctrl-C to stop."
 recentlyDeactivated = False
 button = 16

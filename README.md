@@ -1,6 +1,14 @@
 HOMEALARMPI - Kaveen Kumarasinghe
 =============
-NEW ADDITION: TOuch Sensor: Touch sensor detects when a door is opened from the INSIDE and thus disables the alarm on open.
+
+Video Demonstration: 
+(In the video the buzzers for the audio alarm were NOT plugged in due to noise restrictions, as shown in the beginning of the video. Imagine as if it were there. the audio alarm would sound while the LED was blinking red, and would disable as soon as authentication was detected)
+
+
+https://youtu.be/cEWP5L24baQ
+
+
+NEW ADDITION: Touch Sensor: Touch sensor detects when a door is opened from the INSIDE and thus disables the alarm on open.
 It re enables it when the door is closed and considers it re-armed. A green LED and Beep notifies you of the re-arm.
 
 
