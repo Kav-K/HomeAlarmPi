@@ -1,15 +1,21 @@
 HOMEALARMPI - Kaveen Kumarasinghe
 =============
 
+CODE HAS BEEN CLEANED UP AND COMMENTED!
+
+
 Video Demonstration: 
-(In the video the buzzers for the audio alarm were NOT plugged in due to noise restrictions, as shown in the beginning of the video. Imagine as if it were there. the audio alarm would sound while the LED was blinking red, and would disable as soon as authentication was detected)
 
+Audible explanation of the entire system.
 
-https://youtu.be/cEWP5L24baQ
+-COMING SOON-
 
+NEW ADDITION: Arm/Unarm button - Press button to arm, press again to unarm. Alarm will not ring when unarmed. Not possible to unarm while an
+alarm is active unless authenticated first by a card. Arm and unarm colors are configurable.
 
-NEW ADDITION: Touch Sensor: Touch sensor detects when a door is opened from the INSIDE and thus disables the alarm on open.
+NEW ADDITION: Touch Sensor - Touch sensor detects when a door is opened from the INSIDE and thus disables the alarm on open.
 It re enables it when the door is closed and considers it re-armed. A green LED and Beep notifies you of the re-arm.
+
 
 
 Monitors a doorway and sounds a buzzer and light when opened while armed.
