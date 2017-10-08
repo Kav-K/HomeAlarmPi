@@ -7,7 +7,7 @@ import time
 import signal
 GPIO.cleanup()
 continue_reading = True
-global pressed,armed
+global pressed,active,armed,buttonpressed
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
     global continue_reading
@@ -24,7 +24,9 @@ MIFAREReader = MFRC522.MFRC522()
 # Welcome message
 print "Welcome to the MFRC522 data read example"
 print "Press Ctrl-C to stop."
-armed = False
+recentlyDeactivated = False
+button = 16
+active = False
 buzzer2 = 35
 buzzer = 7
 pressed = False
@@ -32,6 +34,7 @@ switch = 12
 blue = 40
 red = 38
 green = 36
+GPIO.setup(button,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 GPIO.setup(switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 GPIO.setup(buzzer2,GPIO.OUT)
 GPIO.setup(11,GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -47,12 +50,14 @@ buzzerpwm = GPIO.PWM(buzzer,4000)
 bluepwm = GPIO.PWM(blue,6000)
 redpwm = GPIO.PWM(red,4000)
 greenpwm = GPIO.PWM(green,4000)
-bluepwm.start(100)
-redpwm.start(5)
-greenpwm.start(5)
+bluepwm.start(50)
+redpwm.start(75)
+greenpwm.start(0)
 buzzerpwm.start(0)
 disarmed = False
 readsector = 12
+armed = False
+buttonpressed = False
 validpass = [0x62,0x78,0x33,0x32,0x5A,0x5A,0x7A,0x38,0x72,0x73,0x67,0x51,0x51,0x35,0x74,0x37]
 # This loop keeps checking for chips. If one is near it will get the UID and authenticate
 def read():
@@ -128,10 +133,14 @@ def read():
             print "Authentication error"
 dutyset = False
 def callbackTriggered(channel):
-    global pressed,armed
+    global pressed,active,armed
     if (GPIO.input(switch) == 0):
         if (pressed == True):
             pressed = False
+            return
+        if (armed == False):
+            print "Not armed, returning"
+            print armed
             return
         redpwm.ChangeDutyCycle(75)
         redpwm.ChangeFrequency(5)
@@ -142,7 +151,7 @@ def callbackTriggered(channel):
         buzzer2pwm.ChangeFrequency(5)
         buzzerpwm.ChangeFrequency(5)
         dutyset = True
-        armed = True        
+        active = True        
         while True:
             if (read() == 1):
                 redpwm.ChangeDutyCycle(0)
@@ -150,28 +159,72 @@ def callbackTriggered(channel):
                 buzzerpwm.ChangeDutyCycle(0)
                 buzzer2pwm.ChangeDutyCycle(0)
                 dutyset = False
-                armed = False
+                # active = False
+  #              recentlyDeactivated = True
+                active = False
+ #               time.sleep(2)
+#                recentlyDeactivated = False
                 break
+        bluepwm.ChangeDutyCycle(100)
+        redpwm.ChangeDutyCycle(0)
+        armed = True
     else:
-        if (armed == False):
-            pressed = False
-            buzzerpwm.ChangeDutyCycle(100)
-            bluepwm.ChangeDutyCycle(0)       
-            greenpwm.ChangeDutyCycle(100)
+        if (active == False):
+            if (armed == True):
+                pressed = False
+                buzzerpwm.ChangeDutyCycle(100)
+                bluepwm.ChangeDutyCycle(0)       
+                greenpwm.ChangeDutyCycle(100)
             
-            time.sleep(0.5)
-            greenpwm.ChangeDutyCycle(0)
-            bluepwm.ChangeDutyCycle(100)
-            buzzerpwm.ChangeDutyCycle(0)
+                time.sleep(0.5)
+                greenpwm.ChangeDutyCycle(0)
+                bluepwm.ChangeDutyCycle(100)
+                buzzerpwm.ChangeDutyCycle(0)
                 
         print "Triggered"
 def pressedSensor(channel):
-    global pressed
-    print "PRESSED"
-    pressed = True
-    time.sleep(3)
+    global armed
+    if (armed == True):
+
+        global pressed
+        print "PRESSED"
+        pressed = True
+        time.sleep(0.05)
+def pressedButton(channel):
+    global armed,active,buttonpressed
+    #if (buttonpressed == True):
+     #   print buttonpressed
+     #   return
+    if (active != True) and (recentlyDeactivated != True):
+        
+        if (armed == False):
+            armed = True
+            print "Now Armed"
+            print armed
+            bluepwm.ChangeDutyCycle(100)
+            redpwm.ChangeDutyCycle(0)
+            greenpwm.ChangeDutyCycle(0)
+            #return
+        elif (armed == True):
+            armed = False
+            print "Now Unarmed"
+            bluepwm.ChangeDutyCycle(50)
+            redpwm.ChangeDutyCycle(75)
+            redpwm.ChangeFrequency(4000)
+            bluepwm.ChangeFrequency(4000)
+            greenpwm.ChangeDutyCycle(0)
+    else:
+        return
+            #return
+    #buttonpressed = True
+    #time.sleep(3)
+    #buttonpressed = False
+    return
+    
+    
 GPIO.add_event_detect(switch, GPIO.FALLING, callback=callbackTriggered, bouncetime=1000)
 GPIO.add_event_detect(11,GPIO.RISING,callback=pressedSensor,bouncetime=300)
+GPIO.add_event_detect(button,GPIO.FALLING,callback=pressedButton,bouncetime=3000)
 #GPIO.add_event_detect(switch,GPIO.RISING,callback=callbackRested,bouncetime=300)
 
 
