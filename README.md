@@ -8,7 +8,7 @@ Video Demonstration:
 
 Audible explanation of the entire system.
 
--COMING SOON-
+https://youtu.be/hSgm7C1WC1E
 
 NEW ADDITION: Arm/Unarm button - Press button to arm, press again to unarm. Alarm will not ring when unarmed. Not possible to unarm while an
 alarm is active unless authenticated first by a card. Arm and unarm colors are configurable.

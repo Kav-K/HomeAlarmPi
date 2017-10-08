@@ -25,7 +25,7 @@ MIFAREReader = MFRC522.MFRC522()
 print "Welcome to the MFRC522 data read example"
 print "Press Ctrl-C to stop."
 
-
+recentlyDeactivated = False
 
 #Set the pins for the different modules.
 button = 16
@@ -128,7 +128,7 @@ def validAuthNotify():
     greenpwm.ChangeDutyCycle(100)
     buzzerpwm.ChangeDutyCycle(100)
     buzzer2pwm.ChangeDutyCycle(0)
-    time.sleep(0.5)
+    time.sleep(0.3)
     bluepwm.ChangeDutyCycle(100)
     greenpwm.ChangeDutyCycle(0)
     buzzerpwm.ChangeDutyCycle(0)
@@ -220,9 +220,13 @@ def callbackTriggered(channel):
                 active = False
                 break
         #This compensates for late falling edges
-        bluepwm.ChangeDutyCycle(100)
-        redpwm.ChangeDutyCycle(0)
-        armed = True
+        #bluepwm.ChangeDutyCycle(100)
+        #redpwm.ChangeDutyCycle(0)
+        #armed = True
+        arm()
+        recentlyDeactivated = True
+        time.sleep(2)
+        recentlyDeactivated = False
 
     else:
         if (active == False):
@@ -251,11 +255,23 @@ def arm():
     bluepwm.ChangeDutyCycle(100)
     redpwm.ChangeDutyCycle(0)
     greenpwm.ChangeDutyCycle(0)
-
+    buzzerpwm.ChangeDutyCycle(100)
+    time.sleep(0.3)
+    buzzerpwm.ChangeDutyCycle(0)
 def unArm():
     global armed
     armed = False
     print "Now Unarmed"
+    buzzerpwm.ChangeDutyCycle(0)
+    time.sleep(0.2)
+    buzzerpwm.ChangeDutyCycle(100)
+    time.sleep(0.3)
+    buzzerpwm.ChangeDutyCycle(0)
+    time.sleep(0.3)
+    buzzerpwm.ChangeDutyCycle(100)
+    time.sleep(0.3)
+    buzzerpwm.ChangeDutyCycle(0)
+    
     bluepwm.ChangeDutyCycle(50)
     redpwm.ChangeDutyCycle(75)
     redpwm.ChangeFrequency(4000)
@@ -270,7 +286,10 @@ def pressedButton(channel):
             arm()
 
         elif (armed == True):
-            unArm()
+            if (recentlyDeactivated == True):
+                return
+            else:
+                unArm()
     return
     
 
