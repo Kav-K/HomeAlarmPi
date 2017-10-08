@@ -4,6 +4,10 @@ Monitors a doorway and sounds a buzzer and light when opened while armed.
 Uses RFID/NFC cards to disable it. Specific passphrases for disabling of the alarm
 can be set through the Write mechanism. Further comments exist in the code.
 
+The flexibility of this code means you can add multiple modules and/or remove multiple modules to be
+activated during an alarm event, one such example would be adding relays to trigger higher-power devices, adding stepper motors connected to
+door locks to remotely lock doors, and so forth. Expansion ideas are not limited.
+
 BASE of this project is off the MFRC522 Python library.
 
 Code will be cleaned up (it is extremely messy right now) and pin numberings will be added on this page ASAP.
