@@ -7,7 +7,7 @@ import time
 import signal
 GPIO.cleanup()
 continue_reading = True
-
+global pressed,armed
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
     global continue_reading
@@ -24,14 +24,17 @@ MIFAREReader = MFRC522.MFRC522()
 # Welcome message
 print "Welcome to the MFRC522 data read example"
 print "Press Ctrl-C to stop."
+armed = False
 buzzer2 = 35
 buzzer = 7
+pressed = False
 switch = 12
 blue = 40
 red = 38
 green = 36
 GPIO.setup(switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 GPIO.setup(buzzer2,GPIO.OUT)
+GPIO.setup(11,GPIO.IN, pull_up_down=GPIO.PUD_UP)
 buzzer2pwm = GPIO.PWM(buzzer2,1300)
 buzzer2pwm.start(0)
 GPIO.setup(red,GPIO.OUT)
@@ -125,7 +128,11 @@ def read():
             print "Authentication error"
 dutyset = False
 def callbackTriggered(channel):
+    global pressed,armed
     if (GPIO.input(switch) == 0):
+        if (pressed == True):
+            pressed = False
+            return
         redpwm.ChangeDutyCycle(75)
         redpwm.ChangeFrequency(5)
         bluepwm.ChangeDutyCycle(0)
@@ -135,22 +142,40 @@ def callbackTriggered(channel):
         buzzer2pwm.ChangeFrequency(5)
         buzzerpwm.ChangeFrequency(5)
         dutyset = True
+        armed = True        
         while True:
             if (read() == 1):
                 redpwm.ChangeDutyCycle(0)
-                bluepwm.ChangeDutyCycle(75)
+                bluepwm.ChangeDutyCycle(100)
                 buzzerpwm.ChangeDutyCycle(0)
                 buzzer2pwm.ChangeDutyCycle(0)
                 dutyset = False
+                armed = False
                 break
+    else:
+        if (armed == False):
+            pressed = False
+            buzzerpwm.ChangeDutyCycle(100)
+            bluepwm.ChangeDutyCycle(0)       
+            greenpwm.ChangeDutyCycle(100)
+            
+            time.sleep(0.5)
+            greenpwm.ChangeDutyCycle(0)
+            bluepwm.ChangeDutyCycle(100)
+            buzzerpwm.ChangeDutyCycle(0)
                 
         print "Triggered"
-
+def pressedSensor(channel):
+    global pressed
+    print "PRESSED"
+    pressed = True
+    time.sleep(3)
 GPIO.add_event_detect(switch, GPIO.FALLING, callback=callbackTriggered, bouncetime=1000)
+GPIO.add_event_detect(11,GPIO.RISING,callback=pressedSensor,bouncetime=300)
 #GPIO.add_event_detect(switch,GPIO.RISING,callback=callbackRested,bouncetime=300)
 
 
 
 while True:
     #print GPIO.input(switch)
-    time.sleep(0.03)
+    time.sleep(0.05)

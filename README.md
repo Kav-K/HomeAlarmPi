@@ -1,8 +1,14 @@
 HOMEALARMPI - Kaveen Kumarasinghe
 =============
+NEW ADDITION: TOuch Sensor: Touch sensor detects when a door is opened from the INSIDE and thus disables the alarm on open.
+It re enables it when the door is closed and considers it re-armed. A green LED and Beep notifies you of the re-arm.
+
+
 Monitors a doorway and sounds a buzzer and light when opened while armed.
 Uses RFID/NFC cards to disable it. Specific passphrases for disabling of the alarm
 can be set through the Write mechanism. Further comments exist in the code.
+
+
 
 The flexibility of this code means you can add multiple modules and/or remove multiple modules to be
 activated during an alarm event, one such example would be adding relays to trigger higher-power devices, adding stepper motors connected to
