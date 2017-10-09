@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
@@ -5,6 +6,16 @@ import RPi.GPIO as GPIO
 import MFRC522
 import time
 import signal
+
+from twilio.rest import Client
+
+# Your Account SID from twilio.com/console
+account_sid = "ACcea0d3f7a3d725a0aab7b22f51f52431"
+# Your Auth Token from twilio.com/console
+auth_token  = "0585d4f91fd36db3aa752d396f0d3ad9"
+global triggered
+triggered = False
+
 GPIO.cleanup()
 continue_reading = True
 global pressed,active,armed
@@ -200,7 +211,8 @@ def read():
 
 
 def callbackTriggered(channel):
-    global pressed,active,armed
+    counter = 0.005
+    global pressed,active,armed,triggered
     if (GPIO.input(switch) == 0):
         if (pressed == True):
             pressed = False
@@ -213,16 +225,29 @@ def callbackTriggered(channel):
         #Alarm is active, block clicking of sensor and button now
         active = True        
         while True:
+            counter += 0.005
+            print counter
             if (read() == 1):
                 #Return to armed, idle blue state
                 armedIdle()
 
                 active = False
                 break
+            if (counter >= 0.75):
+                if (triggered == False):
+                    client = Client(account_sid, auth_token)
+                    message = client.messages.create(
+                        to="+16477021734", 
+                        from_="+12897698713",
+                        body="The Alarm has been triggered!")
+                    triggered = True
+                    print(message.sid)
+
         #This compensates for late falling edges
         #bluepwm.ChangeDutyCycle(100)
         #redpwm.ChangeDutyCycle(0)
         #armed = True
+        triggered = False
         arm()
         recentlyDeactivated = True
         time.sleep(2)

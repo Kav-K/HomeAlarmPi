@@ -10,6 +10,9 @@ Audible explanation of the entire system.
 
 https://youtu.be/hSgm7C1WC1E
 
+NEW ADDITION: Text message alerts - You must create a twilio account to be able to recieve text message alerts. I have put the framework in the code,
+but you must replace your SID and Auth Token to get it to work.
+
 NEW ADDITION: Arm/Unarm button - Press button to arm, press again to unarm. Alarm will not ring when unarmed. Not possible to unarm while an
 alarm is active unless authenticated first by a card. Arm and unarm colors are configurable.
 
